@@ -28,9 +28,9 @@ class SearchResult extends ValueObject implements IteratorAggregate
     public $facets = [];
 
     /**
-     * @var \eZ\Publish\API\Repository\Values\Content\Query\AggregationInterface[]
+     * @var \eZ\Publish\API\Repository\Values\Content\Search\AggregationResultCollection
      */
-    public $aggregations = [];
+    public $aggregations;
 
     /**
      * The value objects found for the query.
