@@ -9,6 +9,7 @@ namespace eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Compiler;
 use eZ\Publish\API\Repository\PermissionResolver;
 use eZ\Publish\API\Repository\UserService;
 use eZ\Publish\Core\MVC\Symfony\Security\Authentication\AnonymousAuthenticationProvider;
+use eZ\Publish\Core\MVC\Symfony\Security\Authentication\DefaultAuthenticationFailureHandler;
 use eZ\Publish\Core\MVC\Symfony\Security\Authentication\DefaultAuthenticationSuccessHandler;
 use eZ\Publish\Core\MVC\Symfony\Security\Authentication\RememberMeRepositoryAuthenticationProvider;
 use eZ\Publish\Core\MVC\Symfony\Security\Authentication\RepositoryAuthenticationProvider;
@@ -88,5 +89,8 @@ class SecurityPass implements CompilerPassInterface
             'setConfigResolver',
             [$configResolverRef]
         );
+
+        $failureHandlerDef = $container->getDefinition('security.authentication.failure_handler');
+        $failureHandlerDef->setClass(DefaultAuthenticationFailureHandler::class);
     }
 }

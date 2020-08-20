@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace eZ\Publish\Core\Repository\User;
 
 use eZ\Publish\API\Repository\Values\User\User;
-use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
+use eZ\Publish\Core\Repository\User\Exception\UnsupportedPasswordHashType;
 
 /**
  * @internal
@@ -41,7 +41,7 @@ final class PasswordHashService implements PasswordHashServiceInterface
                 return password_hash($password, PASSWORD_DEFAULT);
 
             default:
-                throw new InvalidArgumentException('hashType', "Password hash type '$hashType' is not recognized");
+                throw new UnsupportedPasswordHashType($hashType);
         }
     }
 
