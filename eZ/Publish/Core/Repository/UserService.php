@@ -718,7 +718,7 @@ class UserService implements UserServiceInterface
                     'plainPassword' => $userUpdateStruct->password,
                     'enabled' => $userUpdateStruct->enabled ?? $loadedUser->enabled,
                     'maxLogin' => $userUpdateStruct->maxLogin ?? $loadedUser->maxLogin,
-                    'passwordHashType' => $user->hashAlgorithm,
+                    'passwordHashType' => $userUpdateStruct->hashType ?? $user->hashAlgorithm,
                     'passwordHash' => $user->passwordHash,
                 ])
             );

@@ -58,4 +58,6 @@ class UserUpdateStruct extends ValueObject
      * @var \eZ\Publish\API\Repository\Values\Content\ContentMetadataUpdateStruct
      */
     public $contentMetadataUpdateStruct = null;
+
+    public $hashType = null;
 }

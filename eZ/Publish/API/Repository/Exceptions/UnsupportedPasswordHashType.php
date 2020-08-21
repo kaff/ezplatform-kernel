@@ -5,11 +5,12 @@
  * @license For full copyright and license information view LICENSE file distributed with this source code.
  */
 declare(strict_types=1);
-namespace eZ\Publish\Core\Repository\User\Exception;
+
+namespace eZ\Publish\API\Repository\Exceptions;
 
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 
-//move to api
+//add exception to name
 
 class UnsupportedPasswordHashType extends InvalidArgumentException
 {

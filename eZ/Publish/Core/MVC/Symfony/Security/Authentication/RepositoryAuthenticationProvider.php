@@ -8,11 +8,9 @@ namespace eZ\Publish\Core\MVC\Symfony\Security\Authentication;
 
 use eZ\Publish\API\Repository\PermissionResolver;
 use eZ\Publish\API\Repository\UserService;
-use eZ\Publish\Core\MVC\Symfony\Security\Exception\PasswordExpired;
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 use eZ\Publish\Core\MVC\Symfony\Security\UserInterface as EzUserInterface;
-use eZ\Publish\Core\Repository\User\Exception\UnsupportedPasswordHashType;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -24,6 +22,15 @@ class RepositoryAuthenticationProvider extends DaoAuthenticationProvider
 
     /** @var \eZ\Publish\API\Repository\UserService */
     private $userService;
+
+    /**
+     * @var PasswordHashMigrationService
+     */
+    private $passwordHashMigrationService;
+
+    public function setPasswordHashMigrationService(PasswordHashMigrationService $service) {
+        $this->passwordHashMigrationService  = $service;
+    }
 
     public function setPermissionResolver(PermissionResolver $permissionResolver)
     {
@@ -53,10 +60,26 @@ class RepositoryAuthenticationProvider extends DaoAuthenticationProvider
 
             $apiUser = $currentUser->getAPIUser();
         } else {
-            $credentialsValid = $this->userService->checkUserCredentials($apiUser, $token->getCredentials());
 
-            if (!$credentialsValid) {
-                throw new BadCredentialsException('Invalid credentials', 0);
+            if ($this->passwordHashMigrationService->isMigrationRequired($apiUser->hashAlgorithm)) {
+                $credentialsValid = $this->passwordHashMigrationService->verifyPassword(
+                    $apiUser,
+                    $token->getCredentials(),
+                    'ez.no',
+                    $apiUser->hashAlgorithm
+                );
+
+                if (!$credentialsValid) {
+                    throw new BadCredentialsException('Invalid credentials', 0);
+                }
+
+                $this->passwordHashMigrationService->updatePasswordHash($apiUser, $token->getCredentials());
+            } else {
+                $credentialsValid = $this->userService->checkUserCredentials($apiUser, $token->getCredentials());
+
+                if (!$credentialsValid) {
+                    throw new BadCredentialsException('Invalid credentials', 0);
+                }
             }
         }
 
@@ -64,12 +87,12 @@ class RepositoryAuthenticationProvider extends DaoAuthenticationProvider
         $this->permissionResolver->setCurrentUserReference($apiUser);
     }
 
-    public function authenticate(TokenInterface $token)
-    {
-        try {
-            return parent::authenticate($token);
-        } catch (UnsupportedPasswordHashType $exception) {
-            throw new PasswordExpired($exception);
-        }
-    }
+//    public function authenticate(TokenInterface $token)
+//    {
+//        try {
+//            return parent::authenticate($token);
+//        } catch (UnsupportedPasswordHashType $exception) {
+//            throw new PasswordExpired($exception);
+//        }
+//    }
 }

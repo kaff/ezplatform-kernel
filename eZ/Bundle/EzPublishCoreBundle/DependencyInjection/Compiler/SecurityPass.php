@@ -9,11 +9,11 @@ namespace eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Compiler;
 use eZ\Publish\API\Repository\PermissionResolver;
 use eZ\Publish\API\Repository\UserService;
 use eZ\Publish\Core\MVC\Symfony\Security\Authentication\AnonymousAuthenticationProvider;
-use eZ\Publish\Core\MVC\Symfony\Security\Authentication\DefaultAuthenticationFailureHandler;
 use eZ\Publish\Core\MVC\Symfony\Security\Authentication\DefaultAuthenticationSuccessHandler;
 use eZ\Publish\Core\MVC\Symfony\Security\Authentication\RememberMeRepositoryAuthenticationProvider;
 use eZ\Publish\Core\MVC\Symfony\Security\Authentication\RepositoryAuthenticationProvider;
 use eZ\Publish\Core\MVC\Symfony\Security\HttpUtils;
+use eZ\Publish\Core\MVC\Symfony\Security\Authentication\PasswordHashMigrationService;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -35,6 +35,7 @@ class SecurityPass implements CompilerPassInterface
         $configResolverRef = new Reference('ezpublish.config.resolver');
         $permissionResolverRef = new Reference(PermissionResolver::class);
         $userServiceRef = new Reference(UserService::class);
+        $passwordHashMigrationService = new Reference(PasswordHashMigrationService::class);
 
         // Override and inject the Repository in the authentication provider.
         // We need it for checking user credentials
@@ -48,6 +49,11 @@ class SecurityPass implements CompilerPassInterface
             'setUserService',
             [$userServiceRef]
         );
+        $daoAuthenticationProviderDef->addMethodCall(
+            'setPasswordHashMigrationService',
+            [$passwordHashMigrationService]
+        );
+
 
         $rememberMeAuthenticationProviderDef = $container->findDefinition('security.authentication.provider.rememberme');
         $rememberMeAuthenticationProviderDef->setClass(RememberMeRepositoryAuthenticationProvider::class);
@@ -90,7 +96,7 @@ class SecurityPass implements CompilerPassInterface
             [$configResolverRef]
         );
 
-        $failureHandlerDef = $container->getDefinition('security.authentication.failure_handler');
-        $failureHandlerDef->setClass(DefaultAuthenticationFailureHandler::class);
+//        $failureHandlerDef = $container->getDefinition('security.authentication.failure_handler');
+//        $failureHandlerDef->setClass(DefaultAuthenticationFailureHandler::class);
     }
 }

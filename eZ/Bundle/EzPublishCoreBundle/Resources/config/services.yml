@@ -341,3 +341,11 @@ services:
             $isDebug: '%kernel.debug%'
         tags:
             - { name: console.command, command: ezplatform:reindex }
+
+    eZ\Publish\Core\Repository\User\PasswordHashServiceInterface:
+        alias: eZ\Publish\Core\Repository\User\PasswordHashService
+
+    eZ\Publish\Core\MVC\Symfony\Security\Authentication\PasswordHashMigrationService:
+        arguments:
+            - '@ezpublish.api.repository'
+            - '@eZ\Publish\Core\Repository\User\PasswordHashServiceInterface'
