@@ -148,3 +148,10 @@ services:
             - '@eZ\Publish\Core\IO\IOConfigProvider'
         tags:
             - { name: kernel.event_subscriber }
+
+    ez_publish_iobundle.adapter.local_adapter:
+        class: eZ\Bundle\EzPublishIOBundle\Adapter\LocalAdapter
+        arguments:
+            - $complexConfigProcessor: '@eZ\Bundle\EzPublishCoreBundle\SiteAccess\Config\ComplexConfigProcessor'
+
+    oneup_flysystem.adapter_factory.local: "@ez_publish_iobundle.adapter.local_adapter"
