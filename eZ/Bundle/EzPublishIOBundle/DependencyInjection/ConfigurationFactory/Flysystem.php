@@ -66,6 +66,17 @@ abstract class Flysystem implements ConfigurationFactory, ContainerAwareInterfac
             throw new InvalidConfigurationException("Unknown flysystem adapter $adapter");
         }
 
+        if (!$container->hasDefinition("ComplexConfigProcessorTemp")) {
+            throw new InvalidConfigurationException("ComplexConfigProcessorTemp");
+        }
+
+// it would be better if it works ;) for now ComplexConfigProcessorTemp recieve null on $paramName param, why?????
+//        $configResolverDefinition = $container->getDefinition("ComplexConfigProcessorTemp");
+//        $configResolverDefinition->replaceArgument("\$paramName", 'nfs_adapter.local.directory');
+
+        $flysystemLocalAdapterDefinition = $container->getDefinition($adapterId);
+        $flysystemLocalAdapterDefinition->replaceArgument(0, new Reference("ComplexConfigProcessorTemp"));
+
         $filesystemId = sprintf('ezpublish.core.io.flysystem.%s_filesystem', $name);
         $filesystemServiceDefinition = new ChildDefinition('ezpublish.core.io.flysystem.base_filesystem');
         $definition = $container->setDefinition(

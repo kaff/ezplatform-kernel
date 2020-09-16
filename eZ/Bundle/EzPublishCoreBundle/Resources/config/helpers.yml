@@ -62,3 +62,9 @@ services:
     eZ\Bundle\EzPublishCoreBundle\SiteAccess\Config\IOConfigResolver:
         arguments:
             $complexConfigProcessor: '@eZ\Bundle\EzPublishCoreBundle\SiteAccess\Config\ComplexConfigProcessor'
+
+    ComplexConfigProcessorTemp:
+        class: eZ\Bundle\EzPublishCoreBundle\SiteAccess\Config\ComplexConfigProcessorTemp
+        arguments:
+            $paramName: ''
+            $complexConfigProcessor: '@eZ\Bundle\EzPublishCoreBundle\SiteAccess\Config\ComplexConfigProcessor'
